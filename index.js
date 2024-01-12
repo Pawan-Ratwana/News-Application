@@ -15,7 +15,7 @@ async function fetchNews(category) {
         const data = await res.json();
 
         if (!data || !data.articles) {
-            console.error('Error: Data or articles not found in the API response.');
+            console.error('Error: Data or articles not found in the API response.', data);
             return;
         }
 
@@ -36,8 +36,25 @@ function bindData(articles) {
     const cardsContainer = document.getElementById('cards-container');
     const newsCardTemplate = document.getElementById('template-news-card');
 
+    // Check if articles is defined and is an array
+    if (!Array.isArray(articles)) {
+        console.error('Error: articles is not defined or not an array.', articles);
+        return;
+    }
+
+    // Check if articles array is empty
+    if (articles.length === 0) {
+        console.warn('Warning: articles array is empty.');
+        return;
+    }
+
     articles.forEach(article => {
-        if (!article.urlToImage) return;
+        // Additional check to ensure article is an object
+        if (typeof article !== 'object' || !article.urlToImage) {
+            console.warn('Skipping invalid article:', article);
+            return;
+        }
+
         const cardClone = newsCardTemplate.content.cloneNode(true);
         fillDataInCard(cardClone, article);
         cardsContainer.appendChild(cardClone);
